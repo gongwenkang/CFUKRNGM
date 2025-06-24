@@ -1606,19 +1606,19 @@ void my_cfukrngm_2(const emlrtStack *sp, const struct0_T *param,
   c_st.prev = &b_st;
   c_st.tls = b_st.tls;
   emlrtHeapReferenceStackEnterFcnR2012b((emlrtConstCTX)sp);
-  //  input:
-  //     x0: 原始数据
-  //     n: 用于建模的数据个数
-  //     param：模型的超参数
-  //  output:
-  //      mape: 模型的mape误差
-  //      Xb0：预测的数据，包括拟合和往后预测的数据
-  //  Note that:
-  //   这里是把数据分为两部分，即前面n个和后面的length(data)-n个
-  //   这样做的目的是：后面留下来的数据是用于模型检验的，也就是说，我们用前面n个数据来建立模型，
-  //   然后往后面预测length(data)-n步，以此来检验模型的预测精度
-  //   param（1）是KerGauss核函数的sigma
-  //   param（2）模型的惩罚参数gamma
+//  Input:
+//      x0: raw data
+//      n: number of data points used for modeling
+//      param: model hyper-parameters
+//  Output:
+//      mape: the model’s MAPE error
+//      Xb0: predicted values, including both fitted data and forward forecasts
+//  Note:
+//      The data set is split into two parts: the first n points and the remaining length(data) – n points.
+//      The latter portion is reserved for model validation. That is, we fit the model on the first n points,
+//      then forecast the next length(data) – n steps to assess predictive accuracy.
+//      param(1) is σ of the Gaussian kernel (KerGauss).
+//      param(2) is the regularization parameter γ.
   if (n < 1.0) {
     i = 0;
   } else {
@@ -1650,11 +1650,11 @@ void my_cfukrngm_2(const emlrtStack *sp, const struct0_T *param,
   }
   sigma = param->sigma;
   theta = param->theta;
-  //  累加
+  //  Cumulative sum
   //  x1 = cumsum(data);
   st.site = &b_emlrtRSI;
   // %% CFA conformable fractional accumulation
-  // %% n--建模数据，r--分数阶, x--原始数据，这里x为列向量
+  // %% n--Modeling data，r--Fractional order, x--Raw data，Here, **x** is a column vector.
   // function  confa(x,n,r)
   // ==========================================================================
   beta_tmp_tmp = muDoubleScalarCeil(param->alpha);
@@ -2005,7 +2005,7 @@ void my_cfukrngm_2(const emlrtStack *sp, const struct0_T *param,
     X[i] = Xb[i];
   }
   // %% CFD conformable fractional differential
-  // %% n--建模数据，r--分数阶, x--原始数据，这里x为列向量
+  // %% n--Modeling data，r--Fractional order, x--Raw data，Here, **x** is a column vector.
   // function  confd(x,n,r)
   // ==========================================================================
   xishu.set_size(&w_emlrtRTEI, &st, b_n, b_n);
@@ -2257,14 +2257,5 @@ void my_cfukrngm_2(const emlrtStack *sp, const struct0_T *param,
   }
   st.site = &n_emlrtRSI;
   *mapepre = coder::mean(&st, r);
-  //  tol = 1*n;
-  //  smapefit = zeros(tol,1);
-  //  for i = 1:tol
-  //      randomNumber = randi([1, N]); % 随机选择1到N之间的一个整数
-  //      % randomNumber = randi(N,1,2)
-  //      smapefit(i) =
-  //      mean(abs((Xb0(randomNumber)-x0(randomNumber))./x0(randomNumber)));%随机MAPE
-  //      mapefit = mean(smapefit);
-  //  end
   emlrtHeapReferenceStackLeaveFcnR2012b((emlrtConstCTX)sp);
 }
